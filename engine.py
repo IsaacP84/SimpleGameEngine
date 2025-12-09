@@ -10,8 +10,6 @@ from entities.enemies.enemy import Enemy
 from globals import screen, clock, screen_height, screen_width, Debug
 from physics import (
     physics,
-    applyFriction,
-    cartesian_to_spherical,
     normalize,
     isColliding,
 )
@@ -89,7 +87,7 @@ class Engine:
         if(enemy_count == 0):
             config.app.doGameWin()
             
-        
+        # Check for no health entities
         for e in self.entities.copy().values():
             if e.components.get("Health"):
                 if e.components.get("Health").value <= 0:
@@ -98,10 +96,12 @@ class Engine:
                         continue
                     self.kill(e)
                     
+        # Check for entities that have been marked
         for e in self.entities.copy().values():
             if e.shouldDie:
                 self.kill(e)
 
+        # test to kill and timed entities
         for e in self.entities.copy().values():
             e.alive_time += 1
             if e.max_alive_time:
@@ -146,7 +146,7 @@ class Engine:
         # render ui
         pygame.display.flip()
         
-
+    # removes entity from engine
     def kill(self, e):
         for key, val in self.entities.copy().items():
             if e == val:

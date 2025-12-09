@@ -1,3 +1,4 @@
+# Some component tags
 class DoFriction:
     pass
 
