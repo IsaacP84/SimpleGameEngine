@@ -2,6 +2,12 @@ import numpy as np, pygame, math
 from entities.entity import Entity
 from typing import override,Self
 
+from entities.weapons.gun import Gun
+
+from components.holding import CanHold
+
+from physics import hold
+
 
 class Player(Entity):
     def __init__(self):
@@ -12,9 +18,12 @@ class Player(Entity):
         
         self.width = 50
         self.height = 50
-                
-        # self.shoot_cooldown = 0
-        # self.
+        
+        self.gun = None
+        self.hold_pos = (0,0,0)
+    
+        self.shootCooldown = 120 # in frames
+        self.shootCooldownTimer = 0
         
         
     @classmethod
@@ -27,6 +36,12 @@ class Player(Entity):
         
         p.sprite = pygame.Surface((p.width, p.height), pygame.SRCALPHA)
         p.sprite.fill((255, 255, 255))
+        
+        hold_comp = CanHold()
+        hold_comp.offset = (30,0,0)
+        
+        p.components["CanHold"] = hold_comp
+        
         # pygame.draw.rect(p.sprite, (255, 0, 0), (0,75,50,25))
         return p
     def update(self):
@@ -35,8 +50,18 @@ class Player(Entity):
         if(magnitude > self.max_speed):
             self.vel = (self.vel / magnitude) * self.max_speed
             
+        held_obj = self.components["CanHold"].obj
+        if held_obj:
+            hold(self, held_obj)
+            
+        self.shootCooldownTimer = max(0, self.shootCooldownTimer - 1)
+            
     def shoot(self):
-        pass
+        held_obj = self.components["CanHold"].obj
+        if held_obj:
+            held_obj.use()
+            self.shootCooldownTimer = self.shootCooldown
+        
     
     def move(self, f):
         self.applyForce(f * self.speed)

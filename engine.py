@@ -46,13 +46,23 @@ class Engine:
         move_force = normalize(move_force)
         player.applyForce(move_force)
             
-        # if(pressed[pygame.K_LSHIFT]):
+        if(pressed[pygame.K_SPACE]):
+            player.shoot()
         
         for e in self.entities.values():
             e.heading = e.heading % (2 * np.pi)
             
         physics(self.entities.values())
-       
+        
+        
+        for e in self.entities.copy().values():
+            e.alive_time += 1
+            if e.max_alive_time:
+                if(e.alive_time >= e.max_alive_time):
+                    self.kill(e)
+                    
+        
+
    
     def render(self):
         screen.fill((0,0,0))
@@ -76,6 +86,7 @@ class Engine:
         debug_strings.append(f"Pos: {int(active_object.pos[0])}, {int(active_object.pos[1])}, {int(active_object.pos[2])}")
         debug_strings.append(f"Heading: {active_object.heading:.{3}g}")
         debug_strings.append(f"Vel: {active_object.vel[0]:.{3}g}, {active_object.vel[1]:.{3}g}, {active_object.vel[2]:.{3}g}")
+        debug_strings.append(f"Entities: {len(self.entities)}")
         for i, string in enumerate(debug_strings):
             text_surface = Debug.font().render(string, True, (0, 122, 0))
             screen.blit(text_surface, (0,20*i,100,100))
@@ -85,3 +96,8 @@ class Engine:
         screen.blit(text_surface, (0,screen_height-20,100,100))
         
         pygame.display.flip()
+        
+    def kill(self, e):
+        for key, val in self.entities.copy().items():
+            if e == val:
+                self.entities.pop(key)

@@ -14,6 +14,8 @@ class Entity(ABC):
         
         self.components = dict()
         
+        self.alive_time = 0
+        self.max_alive_time = None
         
     @classmethod
     @abstractmethod

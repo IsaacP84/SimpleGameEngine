@@ -1,5 +1,7 @@
 import numpy as np
 
+from entities.entity import Entity
+
 from globals import FRICTION_COEFFICIENT
 
 def normalize(f):
@@ -53,7 +55,17 @@ def cartesian_to_spherical(x, y, z):
     phi = np.arctan2(y, x)
     return r, theta, phi
 
+# obj is the thing being held
+def hold(target:Entity, obj:Entity):
+    hc = target.components.get("CanHold")
+    if not hc:
+        return
+    obj.pos = target.pos + hc.offset
     
+def follow(target, obj):
+    obj.pos = target.pos
+    return
+
 def physics(entities):
     for e in entities:
         applyFriction(e, FRICTION_COEFFICIENT)
