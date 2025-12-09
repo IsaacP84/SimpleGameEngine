@@ -52,12 +52,10 @@ class Gun(Entity):
         import config
         if(self.useCooldownTimer > 0):
             return
-
-        print("Used gun")
-        app = config.app
-        if not app:
-            return
-        b, id = app.create_entity(Bullet.create, (self.pos, self.heading))
+        if config.SHOW_DEBUG:
+            print("Used gun")
+        
+        b, id = config.app.create_entity(Bullet.create, (self.pos, self.heading))
         cbh = self.components["CanBeHeld"]
         # holder_id = app.engine.getById(cbh.holder_id)
         b.shooter_id = cbh.holder_id

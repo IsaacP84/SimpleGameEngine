@@ -24,7 +24,6 @@ class Player(Entity):
         self.height = 50
         
         self.gun = None
-        self.hold_pos = (0,0,0)
     
         self.shootCooldown = 10 # in frames
         self.shootCooldownTimer = 0
