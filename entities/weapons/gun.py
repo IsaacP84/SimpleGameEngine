@@ -18,8 +18,8 @@ class Gun(Entity):
         
         self.width = 40
         self.height = 20                
-        # self.shoot_cooldown = 0
-        # self.
+        self.useCooldown = 2/60
+        self.useCooldownTimer = 0
         
         
     @classmethod
@@ -37,22 +37,29 @@ class Gun(Entity):
         
         # pygame.draw.rect(p.sprite, (255, 0, 0), (0,75,50,25))
         return e
-    def update(self):
+    def _update(self):
         magnitude = np.linalg.norm(self.vel)
             
         if(magnitude > self.max_speed):
             self.vel = (self.vel / magnitude) * self.max_speed
-
             
+        self.useCooldownTimer = max(0, self.useCooldownTimer - 1)
+
+    @override
+    def _damage(self, obj, amount):
+        pass
     def use(self):
         import config
+        if(self.useCooldownTimer > 0):
+            return
 
         print("Used gun")
         app = config.app
         if not app:
             return
-        b = app.create_entity(None, Bullet.create, ((0,0,0), 0))
+        b, id = app.create_entity(Bullet.create, (self.pos, self.heading))
         b.applyForce((10,0,0))
-        pass
+        
+        self.useCooldownTimer = self.useCooldown
     
  

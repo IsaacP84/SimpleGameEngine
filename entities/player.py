@@ -5,6 +5,10 @@ from typing import override,Self
 from entities.weapons.gun import Gun
 
 from components.holding import CanHold
+from components.physics import DoFriction, DoCollisions
+from components.stats import Health
+
+import config
 
 from physics import hold
 
@@ -22,7 +26,7 @@ class Player(Entity):
         self.gun = None
         self.hold_pos = (0,0,0)
     
-        self.shootCooldown = 120 # in frames
+        self.shootCooldown = 10 # in frames
         self.shootCooldownTimer = 0
         
         
@@ -41,10 +45,15 @@ class Player(Entity):
         hold_comp.offset = (30,0,0)
         
         p.components["CanHold"] = hold_comp
-        
+        p.components["DoFriction"] = DoFriction()
+        p.components["Health"] = Health(10)
+        p.components["DoCollisions"] = DoCollisions()
+
         # pygame.draw.rect(p.sprite, (255, 0, 0), (0,75,50,25))
         return p
-    def update(self):
+    
+    
+    def _update(self):
         magnitude = np.linalg.norm(self.vel)
             
         if(magnitude > self.max_speed):
@@ -59,12 +68,36 @@ class Player(Entity):
     def shoot(self):
         held_obj = self.components["CanHold"].obj
         if held_obj:
+            if self.shootCooldownTimer > 0:
+                return
             held_obj.use()
             self.shootCooldownTimer = self.shootCooldown
         
     
     def move(self, f):
         self.applyForce(f * self.speed)
+        
+    @override
+    def _damage(self, obj, amount):
+        if config.SHOW_DEBUG:
+          print("did damage to player")
+        # avoids circular dependency
+        from entities.bullets.bullet import Bullet
+        from entities.enemies.enemy import Enemy
+        if(isinstance(obj, Bullet) or isinstance(obj, Enemy)):
+            self.components["Health"].value -= amount
+        
+    def onCollision(self, obj):
+        # avoids circular dependency
+        from entities.bullets.bullet import Bullet
+        from entities.enemies.enemy import Enemy
+
+        if(isinstance(obj, Bullet)):
+            pass
+        if(isinstance(obj, Enemy)):
+            pass
+            # try damage
+            # obj.damage(self, self._damage)
     
     # def moveUp(self):
     #     self.applyForce((0, -self.speed, 0))

@@ -1,5 +1,7 @@
 from entities.entity import Entity
+from entities.enemies.enemy import Enemy
 
+from components.physics import DoCollisions
 
 import numpy as np, pygame
 from typing import override,Self
@@ -10,10 +12,14 @@ class Bullet(Entity):
         super().__init__()
         self.speed = 15
         self.max_speed = 15
+        
+        self._damage = 1
         # self.turn_speed = math.radians(3)
         
         self.width = 10
         self.height = 10
+        
+        
         
         self.max_alive_time = 120
         
@@ -28,14 +34,39 @@ class Bullet(Entity):
         
         p.sprite = pygame.Surface((p.width, p.height), pygame.SRCALPHA)
         p.sprite.fill((255, 255, 255))
+        
+        p.components["DoCollisions"] = DoCollisions()
         # pygame.draw.rect(p.sprite, (255, 0, 0), (0,75,50,25))
         return p
-    def update(self):
+    
+    @override
+    def _update(self):
         magnitude = np.linalg.norm(self.vel)
             
         if(magnitude > self.max_speed):
             self.vel = (self.vel / magnitude) * self.max_speed
             
+    @override
+    def _damage(self, obj, amount):
+        pass
     
     def move(self, f):
         self.applyForce(f * self.speed)
+        
+    def onCollision(self, obj):
+        # avoids circular dependency
+        from entities.player import Player
+
+        if(isinstance(obj, Bullet)):
+            pass
+        if(isinstance(obj, Enemy)):
+            # try damage
+            obj.damage(self, self._damage)
+            self.shouldDie = True
+            
+        
+        if(isinstance(obj, Player)):
+            # try damage
+            obj.damage(self, self._damage)
+            
+        

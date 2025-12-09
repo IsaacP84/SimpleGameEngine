@@ -68,7 +68,8 @@ def follow(target, obj):
 
 def physics(entities):
     for e in entities:
-        applyFriction(e, FRICTION_COEFFICIENT)
+        if e.components.get("DoFriction"):
+            applyFriction(e, FRICTION_COEFFICIENT)
         
     for e in entities:
         for i in range(3):
@@ -82,3 +83,13 @@ def physics(entities):
         e.update()
         
     return
+
+def isColliding(target : Entity, obj : Entity):    
+    if (target.pos[0] + target.width/2 >= obj.pos[0] - obj.width/2 and
+        target.pos[0] - target.width/2 <= obj.pos[0] + obj.width/2 and
+        target.pos[1] + target.height/2 >= obj.pos[1] - obj.height/2 and
+         target.pos[1] - target.height/2 <= obj.pos[1] + obj.height/2):
+        return True
+  
+    return False
+    
