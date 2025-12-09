@@ -59,14 +59,14 @@ class Player(Entity):
         if(magnitude > self.max_speed):
             self.vel = (self.vel / magnitude) * self.max_speed
             
-        held_obj = self.components["CanHold"].obj
+        held_obj = config.app.engine.getById(self.components["CanHold"].obj_id)
         if held_obj:
             hold(self, held_obj)
             
         self.shootCooldownTimer = max(0, self.shootCooldownTimer - 1)
             
     def shoot(self):
-        held_obj = self.components["CanHold"].obj
+        held_obj = config.app.engine.getById(self.components["CanHold"].obj_id)
         if held_obj:
             if self.shootCooldownTimer > 0:
                 return

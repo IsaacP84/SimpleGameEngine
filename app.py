@@ -17,16 +17,7 @@ class App:
         self.paused = False
         self.engine = Engine(self)
         
-        p, config.player_id = self.create_entity(Player.create, ((20,screen_height/2,0), 0))
-        gun, _ = self.create_entity(Gun.create, ((0,0,0),0))
-        p.components.get("CanHold").hold(gun)
-        
-        self.cam_pos = np.array([0,0,0], dtype=np.float32)
-        
-        self.game_score = 0
-        
-        for i in range(5):
-            fly, _ = self.create_entity(Fly.create, ((screen_width-20,screen_height/2 + i * 50,0), 0))
+       
         
         
         
@@ -39,6 +30,19 @@ class App:
             print(f"Created entity {id}")
         return e, id
 
+    def setup(self):
+        p, config.player_id = self.create_entity(Player.create, ((20,screen_height/2,0), 0))
+        gun, _ = self.create_entity(Gun.create, ((0,0,0),0))
+        p.components.get("CanHold").hold(p, gun)
+        
+        self.cam_pos = np.array([0,0,0], dtype=np.float32)
+        
+        self.game_score = 0
+        
+        for i in range(5):
+            fly, _ = self.create_entity(Fly.create, ((screen_width-20,screen_height/2 + (i-2.5) * 50,0), 0))
+            
+            
     def run(self):
         # starts the 
         while(self.running):
@@ -78,6 +82,7 @@ if __name__ == "__main__":
     print("Hello, world!")
     pygame.init()
     config.app = App()
+    config.app.setup()
     config.app.run()
     pygame.quit()
     print("good exit")

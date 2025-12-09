@@ -58,6 +58,11 @@ class Gun(Entity):
         if not app:
             return
         b, id = app.create_entity(Bullet.create, (self.pos, self.heading))
+        cbh = self.components["CanBeHeld"]
+        # holder_id = app.engine.getById(cbh.holder_id)
+        b.shooter_id = cbh.holder_id
+        
+        
         b.applyForce((10,0,0))
         
         self.useCooldownTimer = self.useCooldown

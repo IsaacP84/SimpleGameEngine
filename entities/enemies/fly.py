@@ -19,10 +19,10 @@ class Fly(Enemy):
         self.max_speed = 1
         self.turn_speed = math.radians(3)
         
-        self.width = 50
-        self.height = 50
+        self.width = 30
+        self.height = 30
         
-        
+        # used for ai
         self.move_direction = (0,0,0)
                 
         # self.shoot_cooldown = 0
@@ -84,7 +84,7 @@ class Fly(Enemy):
     def onCollision(self, obj):
         # avoids circular dependency
         from entities.player import Player
-
+        
         
         if(isinstance(obj, Enemy)):
            pass

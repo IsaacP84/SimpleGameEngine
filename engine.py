@@ -143,9 +143,21 @@ class Engine:
                 text_surface = Debug.font().render(str(int(clock.get_fps())), True, (0, 122, 0))
                 screen.blit(text_surface, (0, screen_height - 20, 100, 100))
 
+        # render ui
         pygame.display.flip()
+        
 
     def kill(self, e):
         for key, val in self.entities.copy().items():
             if e == val:
                 self.entities.pop(key)
+                
+    def getId(self, e):
+        for key, entity in self.entities.items():
+            if e == entity:
+                return key
+        return 
+    
+    def getById(self, id):
+        return self.entities.get(id)
+        

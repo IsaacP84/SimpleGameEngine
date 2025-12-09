@@ -3,6 +3,8 @@ from entities.enemies.enemy import Enemy
 
 from components.physics import DoCollisions
 
+import config
+
 import numpy as np, pygame
 from typing import override,Self
 
@@ -13,15 +15,19 @@ class Bullet(Entity):
         self.speed = 15
         self.max_speed = 15
         
-        self._damage = 1
+        self._damage_value = 1
         # self.turn_speed = math.radians(3)
         
         self.width = 10
         self.height = 10
         
+        self.shooter_id = None
         
         
         self.max_alive_time = 120
+        
+        self.pierce_count = 0
+        self.piece_limit = 1
         
         
     @classmethod
@@ -53,20 +59,31 @@ class Bullet(Entity):
     def move(self, f):
         self.applyForce(f * self.speed)
         
-    def onCollision(self, obj):
+    def onCollision(self, obj:Entity):
         # avoids circular dependency
         from entities.player import Player
+        
+        # Cant shoot yourself
+        if config.app.engine.getById(self.shooter_id) == obj:
+            return
+        
+        if(self.pierce_count >= self.piece_limit):
+            self.shouldDie = True
+            return
 
         if(isinstance(obj, Bullet)):
             pass
         if(isinstance(obj, Enemy)):
             # try damage
-            obj.damage(self, self._damage)
-            self.shouldDie = True
-            
+            obj.damage(self, self._damage_value)
+            self.pierce_count += 1
         
         if(isinstance(obj, Player)):
             # try damage
-            obj.damage(self, self._damage)
+            obj.damage(self, self._damage_value)
+            self.pierce_count += 1
+            
+        if self.pierce_count > self.piece_limit:
+            self.shouldDie = True
             
         
